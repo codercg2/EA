@@ -8,9 +8,24 @@ switch(func_flag)
         n = 1;      %变量维数
         L = -1000;  %下边界
         U = 1000;   %上边界
+    case 'FON'
+        F1 = @f21;  %目标函数1
+        F2 = @f22;  %目标函数2
+        n = 3;      %变量维数
+        L = -4;  %下边界
+        U = 1000;   %上边界
+    case 'POL'
+        F1 = @f11;  %目标函数1
+        F2 = @f12;  %目标函数2
+        n = 1;      %变量维数
+        L = -1000;  %下边界
+        U = 1000;   %上边界
     otherwise
-        F1 = @f11;
-        F2 = @f22;
+        F1 = @f21;  %目标函数1
+        F2 = @f22;  %目标函数2
+        n = 3;      %变量维数
+        L = -4;  %下边界
+        U = 4;   %上边界
 end
 
 %参数设置
@@ -61,7 +76,8 @@ for gen = 1:MaxGen
     pop = crossover_and_mutation(popNew);
     
     %可视化
-    plot(-pop(1:N,n + 1),pop(1:N,n + 2),'bo');
+    plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
+    title(gen);
     pause(0.01);
 end
 end
