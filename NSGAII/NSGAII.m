@@ -1,6 +1,11 @@
 function [ output_args ] = NSGAII(func_flag)
 %NSGAII 此处显示有关此函数的摘要
 %   此处显示详细说明
+%参数设置
+MaxGen = 300;           %最大代数
+gen = 0;                %当前代数
+N = 100;                %种群规模
+
 switch(func_flag)
     case 'SCH'
         F1 = @f11;  %目标函数1
@@ -20,6 +25,33 @@ switch(func_flag)
         n = 2;      %变量维数
         L = -pi;  %下边界
         U = pi;   %上边界
+    case 'KUR'
+        F1 = @KUR_F1;  %目标函数1
+        F2 = @KUR_F2;  %目标函数2
+        n = 3;      %变量维数
+        L = -5;  %下边界
+        U = 5;   %上边界
+    case 'ZDT1'
+        F1 = @ZDT1_F1;  %目标函数1
+        F2 = @ZDT1_F2;  %目标函数2
+        n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+    case 'ZDT2'
+        F1 = @ZDT2_F1;  %目标函数1
+        F2 = @ZDT2_F2;  %目标函数2
+        n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+        
+        MaxGen = 1000;
+        N = 150;
+    case 'ZDT3'
+        F1 = @ZDT3_F1;  %目标函数1
+        F2 = @ZDT3_F2;  %目标函数2
+        n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
     otherwise
         F1 = @f21;  %目标函数1
         F2 = @f22;  %目标函数2
@@ -28,10 +60,7 @@ switch(func_flag)
         U = 4;   %上边界
 end
 
-%参数设置
-MaxGen = 500;           %最大代数
-gen = 0;                %当前代数
-N = 100;                %种群规模
+
 pop = zeros(N * 2,n + 4);   %当前种群,一行表示一个个体,前n列表示个体向量，n+1,n+2列为目标向量，最后两列分别表示rank和crowding distance
 popNew = zeros(N * 2,n + 4); 
 pop(:,1:n) = rand(N * 2,n) * (U - L) + L;    %初始化种群
@@ -73,7 +102,7 @@ for gen = 1:MaxGen
         end
     end
     %交叉和变异，产生下一代种群
-    pop = crossover_and_mutation(popNew);
+    pop = crossover_and_mutation(popNew,[L,U]);
     
     %可视化
     plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
