@@ -45,7 +45,7 @@ switch(func_flag)
         U = 1;   %上边界
         
         MaxGen = 1000;
-        N = 150;
+        N = 100;
     case 'ZDT3'
         F1 = @ZDT3_F1;  %目标函数1
         F2 = @ZDT3_F2;  %目标函数2

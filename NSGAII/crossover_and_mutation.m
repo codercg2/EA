@@ -1,4 +1,4 @@
-function [ pop ] = crossover_and_mutation( pop,e )
+function [ pop_o ] = crossover_and_mutation( pop,e )
 %CROSSOVER_AND_MUTATION 此处显示有关此函数的摘要
 %   此处显示详细说明
 s = size(pop);
@@ -9,20 +9,58 @@ L = e(1);
 U = e(2);
 
 pc = 0.9;
-pm = 0.05;
+pm = -0.9;
 eta_c = 20;
 eta_m = 20;
 
 k = N + 1;
 while(k <= 2 * N)
+    a = randi(N);
+    b = randi(N);
+    while(a == b)
+        b = randi(N);
+    end
     if(rand() < pc)
         u = rand(1,n);
         tmp1 = u <= 0.5;
         tmp2 = tmp1 * 2 - 1;
-        beta_q = (((u - 1 + tmp1) * tmp2 * 2) .^ tmp2) ^ (1 / (eta_c + 1)); 
+        beta_q = power(((u - 1 + tmp1) .* tmp2 * 2),tmp2) .^ (1 / (eta_c + 1)); 
+
         pop(k,1:n) = 0.5 * (pop(a,1:n) .* (1 + beta_q) + pop(b,1:n) .* (1 - beta_q));
-        pop(k + 1,1:n) = 0.5 * (pop(a,1:n) .* (1 - beta_q) + pop(b,1:n) .* (1 + beta_q));
-        k = k + 2;
+%         if(~isreal(pop))
+%             error('warning');
+%         end
+        out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
+        k = k + ~out_of_range;
+
+        if(k > 2 * N)
+            break;
+        end
+        pop(k,1:n) = 0.5 * (pop(a,1:n) .* (1 - beta_q) + pop(b,1:n) .* (1 + beta_q));
+%         if(~isreal(pop))
+%             error('warning');
+%         end
+        out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
+        k = k + ~out_of_range;
+    end
+    if(rand() < pm)
+        v = pop(a,1:n);
+        u = max(pop(1:N,1:n));
+        l = min(pop(1:N,1:n));
+        r = rand(1,n);
+        delta1 = (v - l)./(u - l);
+        delta2 = (u - v)./(u - l);
+        delta = zeros(1,n);
+        b = r <= 0.5;
+        delta(b) = (2 * r(b) + (1 - 2 * r(b)).*(1 - delta1(b)).^(eta_m + 1)).^(1 / (eta_m + 1)) - 1;
+        b = ~b;
+        delta(b) = 1 - (2*(1-r(b)) + 2 * (r(b)-0.5) .* (1-delta2(b)).^(eta_m + 1)).^(1/(eta_m + 1));
+        pop(k,1:n) = v + delta .* (u - l);
+        if(~isreal(pop(k,1:n)))
+            error('warning');
+        end
+        out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
+        k = k + ~out_of_range;
     end
 %     tmp = 0;
 %     while(true)
@@ -43,5 +81,6 @@ while(k <= 2 * N)
 %     end
 
 end
+pop_o = pop;
 end
 
