@@ -14,6 +14,6 @@ for i = 1:2
         I(j,c) = I(j,c) + (I(j + 1,n + i) - I(j - 1,n + i)) / (I(len, n + i) - I(1, n + i));
     end
 end
-I = sortrows(I,-c);
+I = sortrows(I,-(n + 4));
 end
 

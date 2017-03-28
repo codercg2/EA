@@ -6,6 +6,8 @@ MaxGen = 300;           %最大代数
 gen = 0;                %当前代数
 N = 100;                %种群规模
 
+d = 5;
+eta_c = 20;
 switch(func_flag)
     case 'SCH'
         F1 = @f11;  %目标函数1
@@ -45,11 +47,26 @@ switch(func_flag)
         U = 1;   %上边界
         
         MaxGen = 1000;
-        N = 100;
+        d = 3;
+        eta_c = 30;
     case 'ZDT3'
         F1 = @ZDT3_F1;  %目标函数1
         F2 = @ZDT3_F2;  %目标函数2
         n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+    case 'ZDT4'
+        F1 = @ZDT4_F1;  %目标函数1
+        F2 = @ZDT4_F2;  %目标函数2
+        n = 10;      %变量维数
+        L = -5 * ones(1,n);  %下边界
+        L(1) = 0;
+        U = 5 * ones(1,n);   %上边界
+        U(1) = 1;
+    case 'ZDT6'
+        F1 = @ZDT6_F1;  %目标函数1
+        F2 = @ZDT6_F2;  %目标函数2
+        n = 10;      %变量维数
         L = 0;  %下边界
         U = 1;   %上边界
     otherwise
@@ -63,7 +80,12 @@ end
 
 pop = zeros(N * 2,n + 4);   %当前种群,一行表示一个个体,前n列表示个体向量，n+1,n+2列为目标向量，最后两列分别表示rank和crowding distance
 popNew = zeros(N * 2,n + 4); 
-pop(:,1:n) = rand(N * 2,n) * (U - L) + L;    %初始化种群
+one = ones(N * 2,1);
+if(length(U) > 1)
+    pop(:,1:n) = rand(N * 2,n) .* (one * (U - L)) + one * L;    %初始化种群
+else
+    pop(:,1:n) = rand(N * 2,n) * (U - L) + L;    %初始化种群
+end
 for gen = 1:MaxGen
     for i = 1:2*N
         pop(i,n + 1) = -F1(pop(i,1:n));
@@ -77,23 +99,22 @@ for gen = 1:MaxGen
     while(true)
         frontSet = F{j};
         len = length(frontSet);
-        if(k + len > N)
-            I = zeros(len,n + 4);
-            for i = 1:len
-                r = frontSet(i);
-                I(i,:) = pop(r,:);
-            end
-            break;
-        end
+        
+        I = zeros(len,n + 4);
         for i = 1:len
             r = frontSet(i);
-            popNew(k,:) = pop(r,:);
-            k = k + 1;
+            pop(r,n + 3) = j;   %赋予rank值
+            I(i,:) = pop(r,:);
         end
+        I = crowding_distance_assignment(I);       %计算每类每个个体的crowding distance
+        if(k + len > N)
+            break;
+        end
+        popNew(k:k + len - 1,:) = I;
+        k = k + len;
         j = j + 1;
     end
-    %计算每类每个个体的crowding distance
-    I = crowding_distance_assignment(I);    
+
     for i = 1:size(I,1)
         popNew(k,:) = I(i,:);
         k = k + 1;
@@ -102,7 +123,7 @@ for gen = 1:MaxGen
         end
     end
     %交叉和变异，产生下一代种群
-    pop = crossover_and_mutation(popNew,[L,U]);
+    pop = crossover_and_mutation(popNew,[L;U],d,eta_c);
     
     %可视化
     plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');

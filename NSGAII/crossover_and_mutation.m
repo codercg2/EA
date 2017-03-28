@@ -1,25 +1,28 @@
-function [ pop_o ] = crossover_and_mutation( pop,e )
+function [ pop_o ] = crossover_and_mutation( pop,e,d,eta_c )
 %CROSSOVER_AND_MUTATION 此处显示有关此函数的摘要
 %   此处显示详细说明
 s = size(pop);
 
 N = s(1) / 2;
 n = s(2) - 4;
-L = e(1);
-U = e(2);
+L = e(1,:);
+U = e(2,:);
 
 pc = 0.9;
-pm = -0.9;
-eta_c = 20;
+pm = 0.05;
 eta_m = 20;
 
 k = N + 1;
 while(k <= 2 * N)
-    a = randi(N);
-    b = randi(N);
-    while(a == b)
-        b = randi(N);
-    end
+    %二进制锦标赛选择
+    rp = randperm(N);
+    sel = floor(N/d);
+    rp = rp(1:sel);
+    rp = sort(rp);
+    
+    a = rp(1);
+    b = rp(2);
+
     if(rand() < pc)
         u = rand(1,n);
         tmp1 = u <= 0.5;
