@@ -3,6 +3,6 @@ function [ output ] = ZDT6_F2( x )
 %   此处显示详细说明
 n = length(x);
 g = 1 + 9 * (sum(x(2:n)) / (n - 1)) ^ 0.25;
-output = g * (1 - (x(1) / g) ^ 2);
+output = g * (1 - (ZDT6_F1(x) / g) ^ 2);
 end
 

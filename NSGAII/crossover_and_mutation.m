@@ -1,4 +1,4 @@
-function [ pop_o ] = crossover_and_mutation( pop,e,d,eta_c )
+function [ pop_o ] = crossover_and_mutation( pop,e,pool,eta_c )
 %CROSSOVER_AND_MUTATION 此处显示有关此函数的摘要
 %   此处显示详细说明
 s = size(pop);
@@ -16,7 +16,7 @@ k = N + 1;
 while(k <= 2 * N)
     %二进制锦标赛选择
     rp = randperm(N);
-    sel = floor(N/d);
+    sel = floor(pool);
     rp = rp(1:sel);
     rp = sort(rp);
     
@@ -34,7 +34,8 @@ while(k <= 2 * N)
 %             error('warning');
 %         end
         out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
-        k = k + ~out_of_range;
+        dominate_by_parents = dominate(pop(a,:),pop(k,:)) || dominate(pop(b,:),pop(k,:));
+        k = k + ~(out_of_range||dominate_by_parents);
 
         if(k > 2 * N)
             break;
@@ -44,7 +45,8 @@ while(k <= 2 * N)
 %             error('warning');
 %         end
         out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
-        k = k + ~out_of_range;
+        dominate_by_parents = dominate(pop(a,:),pop(k,:)) || dominate(pop(b,:),pop(k,:));
+        k = k + ~(out_of_range||dominate_by_parents);
     end
     if(rand() < pm)
         v = pop(a,1:n);

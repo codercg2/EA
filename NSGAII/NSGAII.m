@@ -6,8 +6,8 @@ MaxGen = 300;           %最大代数
 gen = 0;                %当前代数
 N = 100;                %种群规模
 
-d = 5;
-eta_c = 20;
+pool = 5;
+eta_c = 15;
 switch(func_flag)
     case 'SCH'
         F1 = @f11;  %目标函数1
@@ -39,6 +39,10 @@ switch(func_flag)
         n = 30;      %变量维数
         L = 0;  %下边界
         U = 1;   %上边界
+        
+        MaxGen = 1000;
+        eta_c = 30;
+        pool = 5;
     case 'ZDT2'
         F1 = @ZDT2_F1;  %目标函数1
         F2 = @ZDT2_F2;  %目标函数2
@@ -47,14 +51,16 @@ switch(func_flag)
         U = 1;   %上边界
         
         MaxGen = 1000;
-        d = 3;
-        eta_c = 30;
+        pool = 3;
+        eta_c = 10;
     case 'ZDT3'
         F1 = @ZDT3_F1;  %目标函数1
         F2 = @ZDT3_F2;  %目标函数2
         n = 30;      %变量维数
         L = 0;  %下边界
         U = 1;   %上边界
+        
+        MaxGen = 1000;
     case 'ZDT4'
         F1 = @ZDT4_F1;  %目标函数1
         F2 = @ZDT4_F2;  %目标函数2
@@ -63,12 +69,17 @@ switch(func_flag)
         L(1) = 0;
         U = 5 * ones(1,n);   %上边界
         U(1) = 1;
+        
+        MaxGen = 2000;
+        eta_c = 40;
     case 'ZDT6'
         F1 = @ZDT6_F1;  %目标函数1
         F2 = @ZDT6_F2;  %目标函数2
         n = 10;      %变量维数
         L = 0;  %下边界
         U = 1;   %上边界
+        eta_c = 5;
+        MaxGen = 1000;
     otherwise
         F1 = @f21;  %目标函数1
         F2 = @f22;  %目标函数2
@@ -123,7 +134,8 @@ for gen = 1:MaxGen
         end
     end
     %交叉和变异，产生下一代种群
-    pop = crossover_and_mutation(popNew,[L;U],d,eta_c);
+    eta_c_1 = 1 + floor(eta_c*((MaxGen - gen)/MaxGen)^6)
+    pop = crossover_and_mutation(popNew,[L;U],pool,eta_c_1);
     
     %可视化
     plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');

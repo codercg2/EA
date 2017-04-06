@@ -38,22 +38,95 @@ function f = evaluate_objective(x, M, V)
 %
 % Number of objective is two, while it can have arbirtarly many decision
 % variables within the range -5 and 5. Common number of variables is 3.
-f = [];
-% Objective function one
-sum = 0;
-for i = 1 : V - 1
-    sum = sum - 10*exp(-0.2*sqrt((x(i))^2 + (x(i + 1))^2));
+func_flag = 'ZDT1';
+switch(func_flag)
+    case 'SCH'
+        F1 = @f11;  %目标函数1
+        F2 = @f12;  %目标函数2
+        n = 1;      %变量维数
+        L = -1000;  %下边界
+        U = 1000;   %上边界
+    case 'FON'
+        F1 = @f21;  %目标函数1
+        F2 = @f22;  %目标函数2
+        n = 3;      %变量维数
+        L = -4;  %下边界
+        U = 4;   %上边界
+    case 'POL'
+        F1 = @f31;  %目标函数1
+        F2 = @f32;  %目标函数2
+        n = 2;      %变量维数
+        L = -pi;  %下边界
+        U = pi;   %上边界
+    case 'KUR'
+        F1 = @KUR_F1;  %目标函数1
+        F2 = @KUR_F2;  %目标函数2
+        n = 3;      %变量维数
+        L = -5;  %下边界
+        U = 5;   %上边界
+    case 'ZDT1'
+        F1 = @ZDT1_F1;  %目标函数1
+        F2 = @ZDT1_F2;  %目标函数2
+        n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+    case 'ZDT2'
+        F1 = @ZDT2_F1;  %目标函数1
+        F2 = @ZDT2_F2;  %目标函数2
+        n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+        
+        MaxGen = 1000;
+        d = 3;
+        eta_c = 30;
+    case 'ZDT3'
+        F1 = @ZDT3_F1;  %目标函数1
+        F2 = @ZDT3_F2;  %目标函数2
+        n = 30;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+    case 'ZDT4'
+        F1 = @ZDT4_F1;  %目标函数1
+        F2 = @ZDT4_F2;  %目标函数2
+        n = 10;      %变量维数
+        L = -5 * ones(1,n);  %下边界
+        L(1) = 0;
+        U = 5 * ones(1,n);   %上边界
+        U(1) = 1;
+    case 'ZDT6'
+        F1 = @ZDT6_F1;  %目标函数1
+        F2 = @ZDT6_F2;  %目标函数2
+        n = 10;      %变量维数
+        L = 0;  %下边界
+        U = 1;   %上边界
+    otherwise
+        F1 = @f21;  %目标函数1
+        F2 = @f22;  %目标函数2
+        n = 3;      %变量维数
+        L = -4;  %下边界
+        U = 4;   %上边界
 end
-% Decision variables are used to form the objective function.
-f(1) = sum;
 
-% Objective function two
-sum = 0;
-for i = 1 : V
-    sum = sum + (abs(x(i))^0.8 + 5*(sin(x(i)))^3);
-end
-% Decision variables are used to form the objective function.
-f(2) = sum;
+% f = [];
+% % Objective function one
+% sum = 0;
+% for i = 1 : V - 1
+%     sum = sum - 10*exp(-0.2*sqrt((x(i))^2 + (x(i + 1))^2));
+% end
+% % Decision variables are used to form the objective function.
+% f(1) = sum;
+% 
+% % Objective function two
+% sum = 0;
+% for i = 1 : V
+%     sum = sum + (abs(x(i))^0.8 + 5*(sin(x(i)))^3);
+% end
+% % Decision variables are used to form the objective function.
+% f(2) = sum;
+
+f(1) = F1(x);
+f(2) = F2(x);
 
 %% Check for error
 if length(f) ~= M
