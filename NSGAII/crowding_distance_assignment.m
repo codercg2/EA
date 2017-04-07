@@ -6,6 +6,7 @@ len = s(1);
 c = s(2);
 n = c - 4;
 
+I(:,c) = 0;
 for i = 1:2
     I = sortrows(I,-(n + i));
     I(1,c) = inf;

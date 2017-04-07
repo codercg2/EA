@@ -2,12 +2,12 @@ function [ output_args ] = NSGAII(func_flag)
 %NSGAII 此处显示有关此函数的摘要
 %   此处显示详细说明
 %参数设置
-MaxGen = 300;           %最大代数
+MaxGen = 250;           %最大代数
 gen = 0;                %当前代数
 N = 100;                %种群规模
 
-pool = 5;
-eta_c = 15;
+pool = 2;
+eta_c = 10;
 switch(func_flag)
     case 'SCH'
         F1 = @f11;  %目标函数1
@@ -41,7 +41,7 @@ switch(func_flag)
         U = 1;   %上边界
         
         MaxGen = 1000;
-        eta_c = 30;
+%         eta_c = 30;
         pool = 5;
     case 'ZDT2'
         F1 = @ZDT2_F1;  %目标函数1
@@ -71,14 +71,14 @@ switch(func_flag)
         U(1) = 1;
         
         MaxGen = 2000;
-        eta_c = 40;
+        pool = 5;
     case 'ZDT6'
         F1 = @ZDT6_F1;  %目标函数1
         F2 = @ZDT6_F2;  %目标函数2
         n = 10;      %变量维数
         L = 0;  %下边界
         U = 1;   %上边界
-        eta_c = 5;
+        pool = 5;
         MaxGen = 1000;
     otherwise
         F1 = @f21;  %目标函数1
@@ -134,13 +134,14 @@ for gen = 1:MaxGen
         end
     end
     %交叉和变异，产生下一代种群
-    eta_c_1 = 1 + floor(eta_c*((MaxGen - gen)/MaxGen)^6)
-    pop = crossover_and_mutation(popNew,[L;U],pool,eta_c_1);
-    
-    %可视化
-    plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
-    title(gen);
-    pause(0.01);
+%     eta_c_1 = 1 + floor(eta_c*((MaxGen - gen)/MaxGen)^6)
+    pop = crossover_and_mutation(popNew,[L;U],F1,F2,pool,eta_c);
+    if(mod(gen,5) == 0)
+        %可视化
+        plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
+        title(gen);
+        pause(0.01);
+    end
 end
 end
 

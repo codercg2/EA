@@ -1,4 +1,4 @@
-function [ pop_o ] = crossover_and_mutation( pop,e,pool,eta_c )
+function [ pop_o ] = crossover_and_mutation( pop,e,F1,F2,pool,eta_c )
 %CROSSOVER_AND_MUTATION 此处显示有关此函数的摘要
 %   此处显示详细说明
 s = size(pop);
@@ -34,7 +34,10 @@ while(k <= 2 * N)
 %             error('warning');
 %         end
         out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
-        dominate_by_parents = dominate(pop(a,:),pop(k,:)) || dominate(pop(b,:),pop(k,:));
+        pop(k,n + 1) = -F1(pop(k,1:n));
+        pop(k,n + 2) = -F2(pop(k,1:n));
+        dominate_by_parents = false;
+%         dominate_by_parents = dominate(pop(a,:),pop(k,:)) && dominate(pop(b,:),pop(k,:));
         k = k + ~(out_of_range||dominate_by_parents);
 
         if(k > 2 * N)
@@ -44,8 +47,10 @@ while(k <= 2 * N)
 %         if(~isreal(pop))
 %             error('warning');
 %         end
+        pop(k,n + 1) = -F1(pop(k,1:n));
+        pop(k,n + 2) = -F2(pop(k,1:n));
         out_of_range = sum(pop(k,1:n) < L) || sum(pop(k,1:n) > U);
-        dominate_by_parents = dominate(pop(a,:),pop(k,:)) || dominate(pop(b,:),pop(k,:));
+%         dominate_by_parents = dominate(pop(a,:),pop(k,:)) && dominate(pop(b,:),pop(k,:));
         k = k + ~(out_of_range||dominate_by_parents);
     end
     if(rand() < pm)
