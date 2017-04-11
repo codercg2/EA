@@ -2,8 +2,8 @@ function [ output_args ] = NSGAII_DE(func_flag)
 %NSGAII_DE 此处显示有关此函数的摘要
 %   此处显示详细说明
 %参数设置
-MaxGen = 300;           %最大代数
-gen = 0;                %当前代数
+MaxGen = 100;           %最大代数
+ExtGen = 50;
 N = 100;                %种群规模
 
 de_F = 0.5;                %DE缩放因子
@@ -15,7 +15,8 @@ switch(func_flag)
         n = 1;      %变量维数
         L = -1000;  %下边界
         U = 1000;   %上边界
-        MaxGen = 2000;
+        MaxGen = 50;
+        ExtGen = 50;
     case 'FON'
         F1 = @f21;  %目标函数1
         F2 = @f22;  %目标函数2
@@ -41,7 +42,7 @@ switch(func_flag)
         L = 0;  %下边界
         U = 1;   %上边界
         
-        MaxGen = 50000;
+        MaxGen = 500;
     case 'ZDT2'
         F1 = @ZDT2_F1;  %目标函数1
         F2 = @ZDT2_F2;  %目标函数2
@@ -58,7 +59,7 @@ switch(func_flag)
         L = 0;  %下边界
         U = 1;   %上边界
         
-        MaxGen = 1000;
+        MaxGen = 400;
     case 'ZDT4'
         F1 = @ZDT4_F1;  %目标函数1
         F2 = @ZDT4_F2;  %目标函数2
@@ -75,7 +76,7 @@ switch(func_flag)
         n = 10;      %变量维数
         L = 0;  %下边界
         U = 1;   %上边界
-        MaxGen = 1000;
+        MaxGen = 500;
     otherwise
         F1 = @f21;  %目标函数1
         F2 = @f22;  %目标函数2
@@ -87,13 +88,16 @@ end
 
 pop = zeros(N * 2,n + 4);   %当前种群,一行表示一个个体,前n列表示个体向量，n+1,n+2列为目标向量，最后两列分别表示rank和crowding distance
 popNew = zeros(N * 2,n + 4); 
+popExtend = zeros(N * ExtGen,n + 4);
+
 one = ones(N * 2,1);
 if(length(U) > 1)
     pop(:,1:n) = rand(N * 2,n) .* (one * (U - L)) + one * L;    %初始化种群
 else
     pop(:,1:n) = rand(N * 2,n) * (U - L) + L;    %初始化种群
 end
-for gen = 1:MaxGen
+
+for gen = 1:MaxGen + ExtGen
     for i = 1:2*N
         pop(i,n + 1) = -F1(pop(i,1:n));
         pop(i,n + 2) = -F2(pop(i,1:n));
@@ -129,15 +133,46 @@ for gen = 1:MaxGen
             break;
         end
     end
-    %交叉和变异，产生下一代种群
-    pop = crossover_and_mutation(popNew,[L;U],F1,F2,de_F,de_cr);
-    
-    %可视化
-    if(mod(gen,5) == 0)
-        plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
-        title(gen);
-        pause(0.01);
+    figure(1);
+    plot(-popNew(1:N,n + 1),-popNew(1:N,n + 2),'bo');
+    hold on;
+%     plot(-I(i:end,n + 1),-I(i:end,n + 2),'rs');
+    title(gen);
+    hold off;
+    pause(0.01);
+
+    if(gen > MaxGen)
+        from = (gen - MaxGen - 1) * N + 1;
+        to = from + N - 1;
+        popExtend(from:to,:) = popNew(1:N,:);
+        figure(3);
+        plot(-popExtend(:,n + 1),-popExtend(:,n + 2),'bo');
+        title('扩充种群');
+        if(gen >= MaxGen + ExtGen)
+            popExtend(:,end) = 0; %最后一列为crowding_distance，现已没有意义
+            popExtend = unique(popExtend,'rows');
+            popExtend(find(popExtend(:,n + 3) > 1),:) = []; %去掉不是最优面的解
+            F_ext = fast_nondominate_sort(popExtend);
+            firstFront = F_ext{1};
+            popNondominateExt = zeros(size(popExtend));
+            for i=1:length(firstFront)
+                popNondominateExt(i,:) = popExtend(firstFront(i),:);
+            end
+            popNondominateExt(find(sum(popNondominateExt,2) == 0),:) = [];
+            popSparsing = sparsing(popNondominateExt,N);
+            figure(4);
+            plot(-popSparsing(:,n + 1),-popSparsing(:,n + 2),'bo');
+            title('最终结果');
+        end
     end
+    
+    
+    %交叉和变异，产生下一代种群
+    pop = crossover_and_mutation(popNew,[L;U],F1,F2,de_F,de_cr);    
 end
+
+figure(2);
+plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
+title('原始结果');
 end
 
