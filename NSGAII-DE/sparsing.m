@@ -15,12 +15,12 @@ popExt = sortrows(popExt,n + 1);
 d = sqrt(sum((popExt(2:extSize,n+1:n+2) - popExt(1:extSize - 1,n+1:n+2)).^2,2));
 d_mean = mean(d);
 d_std = sqrt(var(d));
-abnormal = find(d >= d_mean + 12 * d_std);
+abnormal = find(d >= d_mean + 12 * d_std, 1);
 %如果有异常值，则使用3倍标准差，没有异常值，则使用9倍标准差
-if(length(abnormal) > 0)
-    d_sel = d(find(d < d_mean + 3 * d_std));
+if(~isempty(abnormal))
+    d_sel = d(d < d_mean + 3 * d_std);
 else
-    d_sel = d(find(d < d_mean + 9 * d_std));
+    d_sel = d(d < d_mean + 9 * d_std);
 end
 
 d_avg = sum(d_sel) /(newSize - 1);

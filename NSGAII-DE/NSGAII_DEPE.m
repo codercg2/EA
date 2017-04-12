@@ -1,5 +1,5 @@
-function [ output_args ] = NSGAII_DE(func_flag)
-%NSGAII_DE 此处显示有关此函数的摘要
+function [ output_args ] = NSGAII_DEPE(func_flag)
+%NSGAII_DEPE 此处显示有关此函数的摘要
 %   此处显示详细说明
 %参数设置
 MaxGen = 100;           %最大代数
@@ -69,7 +69,7 @@ switch(func_flag)
         U = 5 * ones(1,n);   %上边界
         U(1) = 1;
         
-        MaxGen = 1000;
+        MaxGen = 600;
     case 'ZDT6'
         F1 = @ZDT6_F1;  %目标函数1
         F2 = @ZDT6_F2;  %目标函数2
@@ -163,7 +163,7 @@ for gen = 1:MaxGen + ExtGen
             plot(-popNondominateExt(:,n + 1),-popNondominateExt(:,n + 2),'bo');
             title('扩充种群取最优面');
             
-            popSparsing = sparsing(popNondominateExt,N);    %稀疏化
+            popSparsing = exact_sparsing(popNondominateExt,N);    %稀疏化
             figure(5);
             plot(-popSparsing(:,n + 1),-popSparsing(:,n + 2),'bo');
             title('最终结果');
