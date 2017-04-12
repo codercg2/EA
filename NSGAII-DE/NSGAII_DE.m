@@ -158,11 +158,16 @@ for gen = 1:MaxGen + ExtGen
             for i=1:length(firstFront)
                 popNondominateExt(i,:) = popExtend(firstFront(i),:);
             end
-            popNondominateExt(find(sum(popNondominateExt,2) == 0),:) = [];
-            popSparsing = sparsing(popNondominateExt,N);
+            popNondominateExt(find(sum(popNondominateExt,2) == 0),:) = []; %去除全为0的行
             figure(4);
+            plot(-popNondominateExt(:,n + 1),-popNondominateExt(:,n + 2),'bo');
+            title('扩充种群取最优面');
+            
+            popSparsing = sparsing(popNondominateExt,N);    %稀疏化
+            figure(5);
             plot(-popSparsing(:,n + 1),-popSparsing(:,n + 2),'bo');
             title('最终结果');
+            fprintf('最终结果种群大小：%d\n',size(popSparsing,1));
         end
     end
     
