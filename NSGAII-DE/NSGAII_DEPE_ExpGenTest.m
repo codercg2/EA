@@ -1,11 +1,11 @@
-function [ output_args ] = NSGAII_DEPE(func_flag)
+function [ output_args ] = NSGAII_DEPE_ExpGenTest(func_flag,ExtGen)
 %NSGAII_DEPE 此处显示有关此函数的摘要
 %   此处显示详细说明
 
 fprintf('\t%s正在计算...',func_flag);
 %参数设置
 MaxGen = 100;           %最大代数
-ExtGen = 50;
+% ExtGen = 50;
 N = 100;                %种群规模
 
 de_F = 0.5;                %DE缩放因子
@@ -171,13 +171,14 @@ for gen = 1:MaxGen + ExtGen
 %             title(sprintf('扩充后F1个体数量=%d,  N=%d, t=%d',size(popNondominateExt,1),N,gen));
             
             popSparsing = exact_sparsing(popNondominateExt,N);    %稀疏化
-            
-            myPlot(5,-popSparsing(:,n + 1),-popSparsing(:,n + 2),sprintf('图片/对比/%s-NSGA-II-DEES',func_flag));
+            myPlot(5,-popSparsing(:,n + 1),-popSparsing(:,n + 2),sprintf('图片/进化代数对比实验/%s-%d-NSGA-II-DEES.emf',func_flag,gen - MaxGen));
 %             figure(5);
-%             h = plot(-popSparsing(:,n + 1),-popSparsing(:,n + 2),'bo');
-%             title(sprintf('NSGA-II-DEES结果 个体数量=%d,  N=%d, t=%d',size(popSparsing,1),N,gen));
+%             %设置坐标轴label
+%             h = plot(-popSparsing(:,n + 1),-popSparsing(:,n + 2),'b.');
+%             xlabel('f1','FontSize',9);
+%             ylabel('f2','FontSize',9);
 %             fprintf('最终结果种群大小：%d\n',size(popSparsing,1));
-%             saveas(h,sprintf('图片/对比/%s-NSGA-II-DEES.png',func_flag));
+%             saveas(h,sprintf('图片/进化代数对比实验/%s-%d-NSGA-II-DEES.emf',func_flag,gen - MaxGen),'meta');
         end
     end
     
@@ -185,10 +186,10 @@ for gen = 1:MaxGen + ExtGen
     %交叉和变异，产生下一代种群
     pop = crossover_and_mutation(popNew,[L;U],F1,F2,de_F,de_cr);    
 end
-myPlot(2,-pop(1:N,n + 1),-pop(1:N,n + 2),sprintf('图片/对比/%s-NSGA-II-DE',func_flag));
+myPlot(2,-pop(1:N,n + 1),-pop(1:N,n + 2),sprintf('图片/进化代数对比实验/%s-%d-NSGA-II-DE.emf',func_flag,ExtGen));
 % figure(2);
 % h = plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
-% title(sprintf('NSGA-II-DE结果 个体数量=%d, N=%d, t=%d',N,N,gen));
-% saveas(h,sprintf('图片/对比/%s-NSGA-II-DE.png',func_flag));
+% % title(sprintf('NSGA-II-DE结果 个体数量=%d,  N=%d, t=%d',N,N,gen));
+% saveas(h,sprintf('图片/进化代数对比实验/%s-%d-NSGA-II-DE.emf',func_flag,ExtGen),'meta');
 end
 

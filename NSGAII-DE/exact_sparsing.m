@@ -1,5 +1,5 @@
 function [ pop ] = exact_sparsing( popExt,newSize )
-%sparsing 此处显示有关此函数的摘要
+%exact_sparsing 精确稀疏化个体数量到newSize个
 %   此处显示详细说明
 save('matlab.mat');
 s = size(popExt);

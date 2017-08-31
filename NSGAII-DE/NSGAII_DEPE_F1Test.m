@@ -2,7 +2,7 @@ function [ output_args ] = NSGAII_DEPE(func_flag)
 %NSGAII_DEPE 此处显示有关此函数的摘要
 %   此处显示详细说明
 
-fprintf('\t%s正在计算...',func_flag);
+fprintf('\t%s正在计算...%n',func_flag);
 %参数设置
 MaxGen = 100;           %最大代数
 ExtGen = 50;
@@ -144,6 +144,10 @@ for gen = 1:MaxGen + ExtGen
 %     title(sprintf('Pt+1个体数量=%d,  N=%d, t=%d',N,N,gen));
 %     pause(0.01);
 %     end
+if(gen == N)
+    myPlot(10,-I(:,n + 1),-I(:,n + 2),sprintf('图片/算法细节分析/%s-F1个体数量=%d,  N=%d, t=%d',func_flag,size(I,1),N,gen));
+    myPlot(1,-popNew(1:N,n + 1),-popNew(1:N,n + 2),sprintf('图片/算法细节分析/%s-Pt+1个体数量=%d,  N=%d, t=%d',func_flag,N,N,gen));
+end
 
     if(gen > MaxGen)
         from = (gen - MaxGen - 1) * N + 1;
@@ -169,15 +173,10 @@ for gen = 1:MaxGen + ExtGen
 %             figure(4);
 %             plot(-popNondominateExt(:,n + 1),-popNondominateExt(:,n + 2),'bo');
 %             title(sprintf('扩充后F1个体数量=%d,  N=%d, t=%d',size(popNondominateExt,1),N,gen));
-            
+            myPlot(4,-popNondominateExt(:,n + 1),-popNondominateExt(:,n + 2),sprintf('图片/算法细节分析/%s扩充后F1个体数量=%d,  N=%d, t=%d',func_flag,size(popNondominateExt,1),N,gen));
+
             popSparsing = exact_sparsing(popNondominateExt,N);    %稀疏化
-            
-            myPlot(5,-popSparsing(:,n + 1),-popSparsing(:,n + 2),sprintf('图片/对比/%s-NSGA-II-DEES',func_flag));
-%             figure(5);
-%             h = plot(-popSparsing(:,n + 1),-popSparsing(:,n + 2),'bo');
-%             title(sprintf('NSGA-II-DEES结果 个体数量=%d,  N=%d, t=%d',size(popSparsing,1),N,gen));
-%             fprintf('最终结果种群大小：%d\n',size(popSparsing,1));
-%             saveas(h,sprintf('图片/对比/%s-NSGA-II-DEES.png',func_flag));
+            myPlot(5,-popSparsing(:,n + 1),-popSparsing(:,n + 2),sprintf('图片/算法细节分析/%s-NSGA-II-DEES-最终结果种群',func_flag));
         end
     end
     
@@ -185,10 +184,8 @@ for gen = 1:MaxGen + ExtGen
     %交叉和变异，产生下一代种群
     pop = crossover_and_mutation(popNew,[L;U],F1,F2,de_F,de_cr);    
 end
-myPlot(2,-pop(1:N,n + 1),-pop(1:N,n + 2),sprintf('图片/对比/%s-NSGA-II-DE',func_flag));
-% figure(2);
-% h = plot(-pop(1:N,n + 1),-pop(1:N,n + 2),'bo');
-% title(sprintf('NSGA-II-DE结果 个体数量=%d, N=%d, t=%d',N,N,gen));
-% saveas(h,sprintf('图片/对比/%s-NSGA-II-DE.png',func_flag));
+
+myPlot(2,-pop(1:N,n + 1),-pop(1:N,n + 2), sprintf('图片/算法细节分析/%s-NSGA-II-DE-最终结果种群',func_flag));
+
 end
 
